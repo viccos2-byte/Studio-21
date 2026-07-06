@@ -1,0 +1,12 @@
+name: Primer workflow
+
+on: [push]
+
+jobs:
+  build:
+     runs-on: windows-lastest
+
+
+     steps:
+     - name: Mostrar mensaje
+       run: echo "Hola desde Github Actions"
