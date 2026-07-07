@@ -1,0 +1,57 @@
+name: Descargar Contenido de YouTube
+on:
+  schedule:
+    - cron: '0 0 * * 1' # Se ejecuta cada lunes a las 00:00 UTC
+  workflow_dispatch:    # Te permite darle al botón "Run workflow" cuando quieras
+
+jobs:
+  descargar:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Necesario para que pueda guardar los archivos en tu repo
+    steps:
+      - name: Checkout del repositorio
+        uses: actions/checkout@v4
+
+      - name: Instalar Python y yt-dlp
+        run: |
+          sudo apt update
+          pip install yt-dlp
+
+      - name: Descargar Musica y Videos
+        run: |
+          # Aseguramos que existan las carpetas
+          mkdir -p musica
+          mkdir -p videos
+          
+          # --- AQUÍ PONES TUS LINKS ---
+          # Puedes añadir todas las líneas que necesites
+           https://www.youtube.com/watch?v=7_CRrQm75xA&list=RD7_CRrQm75xA&start_radio=1
+           https://www.youtube.com/watch?v=oS5DFXEO1ms&list=RDoS5DFXEO1ms&start_radio=1
+           https://www.youtube.com/watch?v=gt7iHOGiF54&list=RDgt7iHOGiF54&start_radio=1
+           https://www.youtube.com/watch?v=8fPGJfdyof4&list=RD8fPGJfdyof4&start_radio=1
+           https://www.youtube.com/watch?v=-OAoYKHSU74&list=RD-OAoYKHSU74&start_radio=1
+           https://www.youtube.com/watch?v=_Kwz3siDo8Q&list=RD_Kwz3siDo8Q&start_radio=1
+           https://www.youtube.com/watch?v=F6TsdgrHVjc&list=RDF6TsdgrHVjc&start_radio=1
+           https://www.youtube.com/watch?v=N_nrpNad2CA&list=RDN_nrpNad2CA&start_radio=1
+           https://www.youtube.com/watch?v=4n6sL0zY8s8&list=RD4n6sL0zY8s8&start_radio=1
+           https://www.youtube.com/watch?v=VB7xucujzDM&list=RDVB7xucujzDM&start_radio=1
+           https://www.youtube.com/watch?v=boFVp87ZZR8&list=RDboFVp87ZZR8&start_radio=1
+           https://www.youtube.com/watch?v=xrxJsPzPscA&list=RDxrxJsPzPscA&start_radio=1
+           https://www.youtube.com/watch?v=p43PeIVZkQA&list=RDp43PeIVZkQA&start_radio=1
+           https://www.youtube.com/watch?v=BuREyORmH8g&list=RDBuREyORmH8g&start_radio=1
+          # Ejemplo para descargar música (cambia el link)
+          yt-dlp -x --audio-format mp3 "https://es1.y2mate.tube/m5h/" -o "musica/%(title)s.%(ext)s"
+          
+          # Ejemplo para descargar video (cambia el link)
+          yt-dlp -f "bestvideo+bestaudio/best" --merge-output-format mp4 "https://es1.y2mate.tube/m5h/
+" -o "videos/%(title)s.%(ext)s"
+
+      - name: Subir cambios al repositorio
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add musica/ videos/
+          # Solo hace el commit si se descargó algo nuevo
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Auto-descarga de contenido: $(date)" && git push)
+
